@@ -1,0 +1,24 @@
+/* pages/explain/explain.wxss */
+page {
+  background: #f6f6f6;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.poem{
+  font-size: 55rpx;
+  font-family: 'STKaiti', Courier, monospace;
+}
+.top{
+  align-self: center;
+  position:relative;
+  top: 40rpx;
+  margin-bottom: 40rpx;
+}
+.first{
+  margin-left: 20rpx;
+  margin-right:20rpx;
+}
+.subtit{
+  font-size: large;
+}

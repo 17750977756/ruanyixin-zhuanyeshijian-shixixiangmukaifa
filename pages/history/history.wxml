@@ -1,0 +1,15 @@
+<!--pages/history/history.wxml-->
+<div wx:for="{{list}}" wx:key='key'>
+  <div class="index">第{{index+1}}条路线</div>
+  <div wx:for="{{item.address}}" wx:key='key' wx:for-index='id' wx:for-item='it'>
+    <div class="addressRow">
+      <div class="hintText">{{it}}</div>
+      <!--   <image src='../images/编辑.png' class='write' catchtap="clickMap" ></image>
+    <image src='../images/删除.png' class='del'  catchtap="del" data-index="{{id}}"></image> -->
+    </div>
+    <div class="arrowblock" wx:if="{{id!=item.address.length-1}}">
+
+      <image src="../images/downarr.png" class="arrow"  > </image>
+    </div>
+  </div>
+</div>

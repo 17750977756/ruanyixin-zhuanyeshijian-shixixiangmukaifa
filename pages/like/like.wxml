@@ -1,0 +1,7 @@
+<mp-cells title="选择您感兴趣的景点，我们将由您感兴趣的景点，推测您可能感兴趣的景点">
+    <mp-checkbox-group prop="checkbox" multi="{{true}}" bindchange="checkboxChange">
+        <mp-checkbox wx:for="{{checkboxItems}}" wx:key="value" label="{{item.name}}" value="{{item.value}}" checked="{{item.checked}}"></mp-checkbox>
+    </mp-checkbox-group>
+    
+</mp-cells>
+<button catchtap="get" style="position: relative; left: 0rpx; top: 92rpx">选好了</button>

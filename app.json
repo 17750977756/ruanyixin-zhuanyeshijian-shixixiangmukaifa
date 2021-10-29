@@ -1,0 +1,69 @@
+{
+  "pages": ["pages/create/create",
+    "pages/explain/explain",
+
+    "pages/like/like",
+    "pages/index/index",
+    "pages/now/now",
+    "pages/logs/logs",
+    "pages/history/history",
+    "pages/mtext/mtext",
+    "pages/near/near"
+
+  ],
+  "tabBar": {
+    "list": [{
+        "text": "定制路线",
+        "pagePath": "pages/create/create",
+        "iconPath": "image/customized.png",
+        "selectedIconPath": "image/customized.png"
+      },
+      {
+        "text": "当前路线",
+        "pagePath": "pages/now/now",
+        "iconPath": "image/指南针.png",
+        "selectedIconPath": "image/指南针.png"
+      },
+      {
+        "text": "侦察姬",
+        "pagePath": "pages/near/near",
+        "iconPath": "image/near.png",
+        "selectedIconPath": "image/near.png"
+      },
+      {
+        "text": "个人中心",
+        "pagePath": "pages/index/index",
+        "iconPath": "image/bussiness-man-fill.png",
+        "selectedIconPath": "image/bussiness-man-fill.png"
+      }
+    ],
+    "color": "#000",
+    "selectedColor": "#00f"
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "侦察姬",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "useExtendedLib": {
+    "weui": true
+  },
+  "plugins": {
+    "routePlan": {
+      "version": "1.0.13",
+      "provider": "wx50b5593e81dd937a"
+    },
+    "chooseLocation": {
+      "version": "1.0.6",
+      "provider": "wx76a9a06e5b4e693e"
+    }
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序定位"
+    }
+  }
+}

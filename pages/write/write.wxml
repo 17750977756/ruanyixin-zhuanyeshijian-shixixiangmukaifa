@@ -1,0 +1,25 @@
+<!--pages/write/write.wxml-->
+
+<!--index.wxml-->
+
+<div class='pic'>
+  <div wx:for="{{tp}}" wx:key="key">
+    <image class="idcard" src="{{item}}"></image>
+  </div>
+</div>
+<div class='choose'  catchtap="clickMap">
+      <image class='chpic' src="../images/choose.png"></image>
+      <text class=" cht">选择位置</text>
+</div>
+<button class="upload" plain="true" type="default" catchtap="chooseImage"> 选择图片 </button>
+<view class="container">
+<text wx:if="{{haspos}}">{{name}}</text>
+  <form bindsubmit="centext">
+    <input name="title" type="text" placeholder="标题"></input>
+    <textarea name="content" auto-height placeholder="文章内容" maxlength="1000" />
+    <switch checked="{{switch1Checked}}" bindchange="switch"/>
+    <text wx:if="{{see}}">仅自己可见</text>
+    <text wx:else>所有用户可见</text>
+    <button form-type="submit" type="primary">提交</button>
+  </form>
+</view>

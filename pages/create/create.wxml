@@ -1,0 +1,32 @@
+<mp-form id="form" rules="{{rules}}" models="{{formData}}">
+
+
+  <mp-cells title="输入希望游玩的景点数量和时间，点击+添加您希望经过的必经点，即可根据您的爱好生成路线" footer="">
+    <mp-cell  title="景点数量" ext-class="">
+      <input type="number" bindinput="pointchange" data-field="qq" class="weui-input" placeholder="请输入景点数量"  />
+    </mp-cell>
+    <mp-cell  title="游玩时间" ext-class="" footer="小时">
+      <input type="digit" bindinput="timechange" data-field="qq" class="weui-input" placeholder="请输入游玩时间" />
+    </mp-cell>
+    
+  </mp-cells>
+  
+</mp-form>
+
+<div wx:for="{{list}}" wx:key='key' wx:for-index='id'>
+  <div class="addressRow">
+
+    <div class="hintText">{{item}}</div>
+
+    <image src='../images/write.png' class='write' catchtap="change" data-index="{{id}}"></image>
+    <image src='../images/del.png' class='del' catchtap="del" data-index="{{id}}"></image>
+  </div>
+  <div class="arrowblock" wx:if="{{id!=list.length-1}}">
+    <image src="../images/downarr.png" class="arrow" data-index="{{id}}" catchtap="guide"> </image>
+  </div>
+</div>
+
+<div class='ad' catchtap="add">
+  <mp-icon icon="add" color="black" size="{{25}}"></mp-icon>
+</div>
+<button catchtap="create" type="primary">生成路线</button>

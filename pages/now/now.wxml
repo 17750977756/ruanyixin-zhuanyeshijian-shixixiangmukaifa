@@ -1,0 +1,20 @@
+<div class="top">点击箭头查看上下两点间导航,点击右侧可保存为历史路线</div>
+
+
+<div wx:for="{{list}}" wx:key='key' wx:for-index='id'>
+  <div class="addressRow">
+    <div class="hintText">{{item}}</div>
+    <image src='../images/write.png' class='write' catchtap="change" data-index="{{id}}"></image>
+    <image src='../images/del.png' class='del' catchtap="del" data-index="{{id}}"></image>
+  </div>
+  <div class="arrowblock" wx:if="{{id!=list.length-1}}">
+    <image src="../images/downarr.png" class="arrow" data-index="{{id}}" catchtap="guide"> </image>
+  </div>
+</div>
+
+<div class='ad' catchtap="add">
+  <mp-icon icon="add" color="black" size="{{25}}"></mp-icon>
+</div>
+<!-- <button type="primary" plain="true" class="newtext" catchtap="write"> 发表一篇记录吧 </button> -->
+
+<image class="save" src="../images/save.png" catchtap="save"></image>

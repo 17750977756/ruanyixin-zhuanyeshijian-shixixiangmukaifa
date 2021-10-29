@@ -1,0 +1,75 @@
+/**index.wxss**/
+
+.idcard {
+  width: 375rpx;
+  height: 375rpx;
+  
+}
+.pic{
+  display:flex;
+  flex-direction: row;
+flex-wrap: wrap;
+}
+.choose{
+  display: flex;
+  margin-left: 80%;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  width: 30%;
+}
+.position{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+.potext{
+  font-size: small;
+}
+.cht{
+  font-size:23rpx;
+  justify-content: center;
+}
+.chpic{
+ justify-content: center;
+  width: 80rpx;
+  height: 60rpx;
+  
+}
+form input {
+  border: 2.34rpx solid #eee;
+  margin: 11.7rpx 0;
+  padding: 11.7rpx;
+  width: 702rpx;
+  font-size: 33rpx;
+}
+
+form textarea {
+  border: 2.34rpx solid #eee;
+  width: 702rpx;
+  min-height: 468rpx;
+  margin: 11.7rpx 0;
+  padding: 11.7rpx;
+  font-size: 32.76rpx;
+}
+
+form button {
+  width: 725rpx;
+  margin: 23rpx 0 0;
+  font-size: 33rpx;
+}
+
+button.upload {
+  width: 310rpx;
+  font-size: 33rpx;
+  margin: 47rpx 0 24rpx 0;
+}.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+} 

@@ -1,0 +1,42 @@
+<!--index.wxml-->
+<div class="userinfo1">
+    <block wx:if="{{canIUseOpenData}}" class="userinfo-opendata">
+      <view class="userinfo-block-avatar" bindtap="bindViewTap">
+        <open-data type="userAvatarUrl"></open-data>
+      </view>
+    </block>
+    <view class="userinfo-nickname-wrapper">
+      <button wx:if="{{!hasUserInfo}}"  class="userinfo-nickname" catchtap="getUserProfile">登录</button>
+      <text wx:else  class="userinfo-nickname"> {{name}}</text>
+    </view> 
+  </div>
+
+
+<view class="page">
+  <view class="page__bd">
+    <view class="weui-grids">
+    
+      
+      <!-- <navigator url="../mtext/mtext" class="weui-grid" hover-class="weui-grid_active">
+        <image class="myimage" src="../images/text.png" />
+        <view class="weui-grid__label">我的文章</view>
+      </navigator> -->
+     
+      <navigator url="../like/like" class="weui-grid" hover-class="weui-grid_active">
+        <image class="myimage" src="../images/favorites.png" />
+        <view class="weui-grid__label">爱好</view>
+      </navigator>
+
+      <navigator url="../history/history" class="weui-grid" hover-class="weui-grid_active">
+        <image class="myimage" src="../images/history.png"/>
+        <view class="weui-grid__label">历史路线</view>
+      </navigator>
+
+      <navigator url="../explain/explain" class="weui-grid" hover-class="weui-grid_active">
+        <image class="myimage" src="../images/explain.png"/>
+        <view class="weui-grid__label">使用说明</view>
+      </navigator>
+    </view>
+  </view>
+</view>
+

@@ -1,0 +1,13 @@
+<!--list.wxml-->
+<!-- diaries里的项目：title text pl -->
+<scroll-view scroll-y="true">
+  <view wx:for="{{diaries}}" wx:for-index="idx" class="item-container" catchtap="myshowDetail" id="{{idx}}" wx:key='key'>
+    <image  wx:if="{{item.pl[0]}}" mode="aspectFit" src="{{item.pl[0]}}" class="cover"></image>
+    <view class="desc">
+      <view class="left">
+        <view style="font-size:32rpx;margin:10rpx 0;">{{item.title}}</view>
+        <view style="font-size:24rpx;color:darkgray">{{item.time}}</view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
