@@ -22,7 +22,7 @@ Page({
    */
   onLoad: function (options) {
     qqmapsdk = new QQMapWX({
-      key: 'M3RBZ-FHG6J-YGBFW-KJ3KD-QQ7B7-SBBOY'
+      key: 'KNZBZ-WNMLT-UECXY-LT2TY-YZZN7-L7F64'
     });
     var that = this
     wx.getSetting({

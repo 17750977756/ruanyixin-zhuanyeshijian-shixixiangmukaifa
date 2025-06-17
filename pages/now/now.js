@@ -17,8 +17,8 @@ Page({
 		address: "",
 		what: 0,
 		list: [],
-		key: 'M3RBZ-FHG6J-YGBFW-KJ3KD-QQ7B7-SBBOY', //在腾讯位置服务申请的key
-		referer: 'zglxdm', //调用腾讯位置服务相关插件的app的名称
+		key: 'KNZBZ-WNMLT-UECXY-LT2TY-YZZN7-L7F64', //在腾讯位置服务申请的key
+		referer: 'POI推荐', //调用腾讯位置服务相关插件的app的名称
 		rightArrow: "../images/rightArrow.png"
 	},
 

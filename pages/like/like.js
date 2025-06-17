@@ -48,7 +48,7 @@ db.collection('user').doc(app.globalData.openid).update({
   })
   const res = await wx.cloud.callContainer({
     config: {
-      env: 'h2h2-2gwfffx2350d6b21',
+      env: 'cloud1-2gzvk2cf379b86fb',
     },
     path: '/container-test/svd', // 填入业务自定义路径和参数
     header:{
