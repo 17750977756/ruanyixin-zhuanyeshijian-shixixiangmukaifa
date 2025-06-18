@@ -1,15 +1,16 @@
-# 基于用户评分的兴趣点推荐小程序
+# 基于元路径增强视图的分层对比学习推荐小程序
 
 ## 1. 项目背景与意义
 
 ### 1.1 项目背景
-在当今信息爆炸的时代，用户面临着海量的兴趣点选择，如何快速找到符合个人喜好的地点成为一个重要问题。本项目旨在通过用户评分系统，为用户提供个性化的兴趣点推荐服务。
+在当今信息爆炸的时代，用户面临着海量的兴趣点选择，如何快速找到符合个人喜好的地点成为一个重要问题。本项目旨在通过基于元路径增强视图的分层对比学习推荐算法，为用户提供更加精准和个性化的兴趣点推荐服务。
 
 ### 1.2 项目意义
 - 解决用户选择困难的问题
-- 提供个性化的推荐服务
+- 提供基于异构信息网络的精准推荐服务
 - 帮助用户发现更多符合个人喜好的地点
 - 提升用户体验和决策效率
+- 实现位置社会网络中的无监督兴趣点推荐任务
 
 ## 2. 技术方案
 
@@ -19,6 +20,8 @@
 - 腾讯地图API（QQMap）
 - 云数据库
 - 云函数
+- 元路径增强视图技术
+- 分层对比学习算法
 
 ### 2.2 系统架构
 ```
@@ -29,459 +32,206 @@
 │   ├── history/         # 历史记录
 │   └── write/           # 评分写入
 ├── cloudbase/           # 云开发相关
+│   └── metapath_recommendation/  # 元路径推荐算法
 ├── utils/              # 工具函数
+│   └── recommendationUtils.js   # 推荐算法工具类
 └── style/              # 样式文件
 ```
 
 ## 3. 核心功能与算法
 
-### 3.1 推荐算法
-本项目采用基于协同过滤的推荐算法，主要包含以下步骤：
+### 3.1 推荐算法概述
+本项目采用基于元路径增强视图的分层对比学习推荐算法，该方法设计了一种基于元路径增强视图，先根据目标节点非同质节点的聚合特征，将其作为增强视图节点对间的边特征，再根据节点间元路径的关联度和三阶段的注意力机制进行聚合，从而更高效地描述节点嵌入。最后，设计了一种结合了结构语义和特征语义的协同正样本选择策略，并使用分层对比学习的自监督方法，包括元路径之间的嵌入对比和整体的嵌入对比，以及高阶视图和结构视图的对比，通过多层次的对比，利用有效的监督信息指导模型训练，从而充分捕捉异构信息网络的信息。
 
-1. 用户评分数据收集
-2. 相似度计算
-3. 推荐结果生成
+### 3.2 算法架构图
 
-### 3.2 算法详细说明
+#### 3.2.1 完整对比学习框架
+![完整对比学习框架](完整对比学习框架5.drawio.png)
 
-#### 3.2.1 协同过滤算法实现
-本项目采用基于用户的协同过滤（User-Based Collaborative Filtering）算法，主要包含以下步骤：
+#### 3.2.2 基于元路径实例数量子图构建
+![基于元路径实例数量子图构建](基于元路径实例数量子图构建.png)
 
-1. **用户-兴趣点评分矩阵构建**
-   - 构建用户对兴趣点的评分矩阵 R(m×n)
-   - m 表示用户数量，n 表示兴趣点数量
-   - R(i,j) 表示用户 i 对兴趣点 j 的评分
+#### 3.2.3 边特征构建
+![边特征构建](边特特征构建.png)
 
-2. **用户相似度计算**
-   使用皮尔逊相关系数（Pearson Correlation Coefficient）计算用户相似度：
-   ```math
-   sim(u,v) = \frac{\sum_{i=1}^{n}(R_{u,i} - \bar{R_u})(R_{v,i} - \bar{R_v})}{\sqrt{\sum_{i=1}^{n}(R_{u,i} - \bar{R_u})^2} \sqrt{\sum_{i=1}^{n}(R_{v,i} - \bar{R_v})^2}}
-   ```
-   其中：
-   - u, v 表示两个用户
-   - R_{u,i} 表示用户 u 对兴趣点 i 的评分
-   - \bar{R_u} 表示用户 u 的平均评分
+### 3.3 算法详细说明
 
-3. **推荐分数计算**
-   对于目标用户 u 和未评分的兴趣点 i，预测评分计算如下：
-   ```math
-   P_{u,i} = \bar{R_u} + \frac{\sum_{v \in N} sim(u,v) \times (R_{v,i} - \bar{R_v})}{\sum_{v \in N} |sim(u,v)|}
-   ```
-   其中：
-   - N 是与用户 u 最相似的 k 个用户的集合
-   - P_{u,i} 是预测的用户 u 对兴趣点 i 的评分
+#### 3.3.1 元路径增强视图构建
 
-#### 3.2.2 算法优化策略
+1. **异构信息网络建模**
+   - 构建包含用户、兴趣点、类别、位置、标签等多种节点类型的异构信息网络
+   - 定义多种元路径类型：
+     - U-P-U（用户-兴趣点-用户）
+     - U-P-C-P-U（用户-兴趣点-类别-兴趣点-用户）
+     - U-P-L-P-U（用户-兴趣点-位置-兴趣点-用户）
+     - U-P-T-P-U（用户-兴趣点-标签-兴趣点-用户）
 
-1. **数据稀疏性处理**
-   - 使用基于内容的过滤补充协同过滤
-   - 对评分矩阵进行降维处理
-   - 引入兴趣点特征信息
+2. **增强视图节点特征聚合**
+   - 根据目标节点非同质节点的聚合特征
+   - 将其作为增强视图节点对间的边特征
+   - 基于地理位置聚类和标签关联构建边关系
 
-2. **冷启动问题解决**
-   - 新用户：基于地理位置和兴趣点类型进行初始推荐
-   - 新兴趣点：基于兴趣点特征和相似兴趣点进行推荐
+#### 3.3.2 三阶段注意力机制
 
-3. **实时性优化**
-   - 使用滑动窗口机制更新用户相似度
-   - 增量更新推荐结果
-   - 缓存热门推荐结果
+1. **节点级注意力**
+   - 基于节点特征相似度计算注意力权重
+   - 考虑用户和兴趣点的嵌入向量相似性
 
-#### 3.2.3 推荐系统评估指标
+2. **边级注意力**
+   - 基于边的权重和元数据计算注意力
+   - 考虑评分、类别、位置等元信息
+
+3. **路径级注意力**
+   - 基于路径的复杂度和重要性计算注意力
+   - 考虑节点在网络中的重要性
+
+#### 3.3.3 协同正样本选择策略
+
+1. **结构语义正样本**
+   - 基于网络结构相似性选择正样本
+   - 通过元路径视图识别结构相似的用户
+
+2. **特征语义正样本**
+   - 基于用户偏好相似性选择正样本
+   - 使用皮尔逊相关系数计算用户相似度
+
+3. **混合正样本**
+   - 结合结构和特征信息选择正样本
+   - 加权组合结构相似性和特征相似性
+
+#### 3.3.4 分层对比学习
+
+1. **第一层：元路径之间的嵌入对比**
+   - 为每种元路径类型构建独立的嵌入视图
+   - 在不同元路径之间进行对比学习
+
+2. **第二层：整体的嵌入对比**
+   - 聚合所有元路径的嵌入信息
+   - 进行全局的嵌入对比学习
+
+3. **第三层：高阶视图和结构视图的对比**
+   - 基于正样本进行对比学习优化
+   - 结合结构语义和特征语义信息
+
+### 3.4 算法优势
+
+1. **更有效的异质信息捕获**
+   - 通过元路径增强视图更有效地捕获异质信息网络中多层次的信息
+   - 充分利用异构网络的结构信息
+
+2. **多维度相似性建模**
+   - 结合结构语义和特征语义的协同正样本选择
+   - 从多个维度建模用户和兴趣点的相似性
+
+3. **分层学习策略**
+   - 多层次的对比学习提高推荐准确性
+   - 从局部到全局的渐进式学习
+
+4. **位置社会网络适用性**
+   - 特别适用于位置社会网络中的无监督兴趣点推荐任务
+   - 考虑地理位置和社交关系的影响
+
+### 3.5 关键代码实现
+
+```javascript
+// 元路径增强推荐算法类
+class MetaPathEnhancedRecommendation {
+  constructor() {
+    this.userEmbeddings = new Map()
+    this.placeEmbeddings = new Map()
+    this.metaPaths = []
+    this.attentionWeights = new Map()
+    this.positiveSamples = new Map()
+  }
+
+  // 初始化元路径
+  initializeMetaPaths() {
+    this.metaPaths = [
+      { type: 'UPU', path: ['user', 'place', 'user'], weight: 0.3 },
+      { type: 'UPCPU', path: ['user', 'place', 'category', 'place', 'user'], weight: 0.25 },
+      { type: 'UPLPU', path: ['user', 'place', 'location', 'place', 'user'], weight: 0.25 },
+      { type: 'UPTPU', path: ['user', 'place', 'tag', 'place', 'user'], weight: 0.2 }
+    ]
+  }
+
+  // 构建元路径增强视图
+  buildMetaPathEnhancedView(network) {
+    const enhancedViews = new Map()
+    for (const metaPath of this.metaPaths) {
+      const view = this.createEnhancedView(network, metaPath)
+      enhancedViews.set(metaPath.type, view)
+    }
+    return enhancedViews
+  }
+
+  // 三阶段注意力机制
+  applyThreeStageAttention(network, enhancedViews) {
+    const attentionResults = new Map()
+    for (const [metaPathType, view] of enhancedViews) {
+      const attention = this.calculateAttention(view, network)
+      attentionResults.set(metaPathType, attention)
+    }
+    return attentionResults
+  }
+
+  // 协同正样本选择
+  selectPositiveSamples(network, enhancedViews, attentionResults) {
+    const positiveSamples = new Map()
+    for (const [userId, user] of network.users) {
+      const samples = this.selectUserPositiveSamples(user, network, enhancedViews, attentionResults)
+      positiveSamples.set(userId, samples)
+    }
+    return positiveSamples
+  }
+
+  // 分层对比学习
+  async performHierarchicalContrastiveLearning(network, enhancedViews, attentionResults, positiveSamples) {
+    // 第一层：元路径之间的嵌入对比
+    const metaPathEmbeddings = await this.metaPathContrastiveLearning(network, enhancedViews, attentionResults)
+    
+    // 第二层：整体的嵌入对比
+    const globalEmbeddings = await this.globalContrastiveLearning(network, metaPathEmbeddings)
+    
+    // 第三层：高阶视图和结构视图的对比
+    const finalEmbeddings = await this.highOrderContrastiveLearning(network, globalEmbeddings, positiveSamples)
+    
+    return finalEmbeddings
+  }
+
+  // 生成推荐
+  async generateRecommendations(userId, options = {}) {
+    const network = await this.buildHeterogeneousNetwork()
+    this.initializeMetaPaths()
+    const enhancedViews = this.buildMetaPathEnhancedView(network)
+    const attentionResults = this.applyThreeStageAttention(network, enhancedViews)
+    const positiveSamples = this.selectPositiveSamples(network, enhancedViews, attentionResults)
+    const embeddings = await this.performHierarchicalContrastiveLearning(network, enhancedViews, attentionResults, positiveSamples)
+    return this.generateFinalRecommendations(userId, network, embeddings, options.topK, options.location, options.radius)
+  }
+}
+```
+
+### 3.6 推荐系统评估指标
 
 1. **准确率指标**
    - MAE（平均绝对误差）
    - RMSE（均方根误差）
+   - 推荐准确率
 
 2. **覆盖率指标**
    - 推荐结果的多样性
    - 长尾兴趣点的推荐比例
+   - 元路径覆盖率
 
 3. **实时性指标**
    - 推荐结果更新延迟
    - 系统响应时间
+   - 算法收敛速度
 
-#### 3.2.4 关键代码实现
-
-```javascript
-// 计算用户相似度
-function calculateUserSimilarity(user1, user2) {
-    const commonRatings = getCommonRatings(user1, user2);
-    if (commonRatings.length === 0) return 0;
-    
-    const user1Mean = calculateMeanRating(user1);
-    const user2Mean = calculateMeanRating(user2);
-    
-    let numerator = 0;
-    let denominator1 = 0;
-    let denominator2 = 0;
-    
-    for (const rating of commonRatings) {
-        const diff1 = rating.user1Rating - user1Mean;
-        const diff2 = rating.user2Rating - user2Mean;
-        numerator += diff1 * diff2;
-        denominator1 += diff1 * diff1;
-        denominator2 += diff2 * diff2;
-    }
-    
-    return numerator / (Math.sqrt(denominator1) * Math.sqrt(denominator2));
-}
-
-// 生成推荐
-function generateRecommendations(userId, k = 5) {
-    const userRatings = getUserRatings(userId);
-    const similarUsers = findSimilarUsers(userId, k);
-    const recommendations = [];
-    
-    for (const place of unratedPlaces) {
-        let predictedRating = 0;
-        let similaritySum = 0;
-        
-        for (const similarUser of similarUsers) {
-            const similarity = calculateUserSimilarity(userId, similarUser.id);
-            const rating = similarUser.ratings[place.id];
-            if (rating) {
-                predictedRating += similarity * (rating - similarUser.meanRating);
-                similaritySum += Math.abs(similarity);
-            }
-        }
-        
-        if (similaritySum > 0) {
-            predictedRating = userRatings.meanRating + predictedRating / similaritySum;
-            recommendations.push({
-                placeId: place.id,
-                predictedRating: predictedRating
-            });
-        }
-    }
-    
-    return recommendations.sort((a, b) => b.predictedRating - a.predictedRating);
-}
-```
-
-#### 3.2.5 推荐算法具体实现
-
-1. **数据预处理**
-```javascript
-// 数据预处理类
-class DataPreprocessor {
-    constructor() {
-        this.userRatings = new Map();  // 用户评分数据
-        this.placeFeatures = new Map(); // 兴趣点特征
-    }
-
-    // 加载用户评分数据
-    async loadUserRatings() {
-        const ratings = await db.collection('ratings').get();
-        for (const rating of ratings.data) {
-            if (!this.userRatings.has(rating.userId)) {
-                this.userRatings.set(rating.userId, new Map());
-            }
-            this.userRatings.get(rating.userId).set(rating.placeId, rating.rating);
-        }
-    }
-
-    // 加载兴趣点特征
-    async loadPlaceFeatures() {
-        const places = await db.collection('places').get();
-        for (const place of places.data) {
-            this.placeFeatures.set(place.placeId, {
-                category: place.category,
-                tags: place.tags,
-                location: place.location
-            });
-        }
-    }
-
-    // 计算用户平均评分
-    calculateUserMeanRating(userId) {
-        const ratings = Array.from(this.userRatings.get(userId).values());
-        return ratings.reduce((a, b) => a + b, 0) / ratings.length;
-    }
-}
-```
-
-2. **相似度计算实现**
-```javascript
-// 相似度计算类
-class SimilarityCalculator {
-    constructor(dataPreprocessor) {
-        this.dataPreprocessor = dataPreprocessor;
-    }
-
-    // 计算皮尔逊相关系数
-    calculatePearsonCorrelation(user1, user2) {
-        const user1Ratings = this.dataPreprocessor.userRatings.get(user1);
-        const user2Ratings = this.dataPreprocessor.userRatings.get(user2);
-        
-        // 获取共同评分的兴趣点
-        const commonPlaces = Array.from(user1Ratings.keys())
-            .filter(placeId => user2Ratings.has(placeId));
-        
-        if (commonPlaces.length === 0) return 0;
-
-        const user1Mean = this.dataPreprocessor.calculateUserMeanRating(user1);
-        const user2Mean = this.dataPreprocessor.calculateUserMeanRating(user2);
-
-        let numerator = 0;
-        let denominator1 = 0;
-        let denominator2 = 0;
-
-        for (const placeId of commonPlaces) {
-            const diff1 = user1Ratings.get(placeId) - user1Mean;
-            const diff2 = user2Ratings.get(placeId) - user2Mean;
-            numerator += diff1 * diff2;
-            denominator1 += diff1 * diff1;
-            denominator2 += diff2 * diff2;
-        }
-
-        if (denominator1 === 0 || denominator2 === 0) return 0;
-        return numerator / (Math.sqrt(denominator1) * Math.sqrt(denominator2));
-    }
-
-    // 计算余弦相似度
-    calculateCosineSimilarity(user1, user2) {
-        const user1Ratings = this.dataPreprocessor.userRatings.get(user1);
-        const user2Ratings = this.dataPreprocessor.userRatings.get(user2);
-        
-        const commonPlaces = Array.from(user1Ratings.keys())
-            .filter(placeId => user2Ratings.has(placeId));
-        
-        if (commonPlaces.length === 0) return 0;
-
-        let dotProduct = 0;
-        let norm1 = 0;
-        let norm2 = 0;
-
-        for (const placeId of commonPlaces) {
-            const rating1 = user1Ratings.get(placeId);
-            const rating2 = user2Ratings.get(placeId);
-            dotProduct += rating1 * rating2;
-            norm1 += rating1 * rating1;
-            norm2 += rating2 * rating2;
-        }
-
-        if (norm1 === 0 || norm2 === 0) return 0;
-        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
-    }
-}
-```
-
-3. **推荐系统核心实现**
-```javascript
-// 推荐系统类
-class RecommendationSystem {
-    constructor(dataPreprocessor, similarityCalculator) {
-        this.dataPreprocessor = dataPreprocessor;
-        this.similarityCalculator = similarityCalculator;
-        this.cache = new Map(); // 缓存推荐结果
-    }
-
-    // 获取相似用户
-    async findSimilarUsers(userId, k = 5) {
-        const similarities = [];
-        const userRatings = this.dataPreprocessor.userRatings;
-
-        for (const [otherUserId, _] of userRatings) {
-            if (otherUserId === userId) continue;
-            
-            const similarity = this.similarityCalculator.calculatePearsonCorrelation(userId, otherUserId);
-            similarities.push({ userId: otherUserId, similarity });
-        }
-
-        return similarities
-            .sort((a, b) => b.similarity - a.similarity)
-            .slice(0, k);
-    }
-
-    // 生成推荐
-    async generateRecommendations(userId, options = {}) {
-        const {
-            k = 5,                    // 相似用户数量
-            minSimilarity = 0.1,      // 最小相似度阈值
-            maxRecommendations = 20,  // 最大推荐数量
-            location = null,          // 位置信息
-            radius = 5000            // 搜索半径（米）
-        } = options;
-
-        // 检查缓存
-        const cacheKey = `${userId}_${JSON.stringify(options)}`;
-        if (this.cache.has(cacheKey)) {
-            return this.cache.get(cacheKey);
-        }
-
-        const similarUsers = await this.findSimilarUsers(userId, k);
-        const userRatings = this.dataPreprocessor.userRatings.get(userId);
-        const userMeanRating = this.dataPreprocessor.calculateUserMeanRating(userId);
-
-        // 获取所有可能的推荐兴趣点
-        let candidatePlaces = new Set();
-        for (const { userId: similarUserId } of similarUsers) {
-            const similarUserRatings = this.dataPreprocessor.userRatings.get(similarUserId);
-            for (const placeId of similarUserRatings.keys()) {
-                if (!userRatings.has(placeId)) {
-                    candidatePlaces.add(placeId);
-                }
-            }
-        }
-
-        // 计算预测评分
-        const predictions = [];
-        for (const placeId of candidatePlaces) {
-            let weightedSum = 0;
-            let similaritySum = 0;
-
-            for (const { userId: similarUserId, similarity } of similarUsers) {
-                if (similarity < minSimilarity) continue;
-
-                const similarUserRatings = this.dataPreprocessor.userRatings.get(similarUserId);
-                const rating = similarUserRatings.get(placeId);
-                if (rating) {
-                    const similarUserMean = this.dataPreprocessor.calculateUserMeanRating(similarUserId);
-                    weightedSum += similarity * (rating - similarUserMean);
-                    similaritySum += Math.abs(similarity);
-                }
-            }
-
-            if (similaritySum > 0) {
-                const predictedRating = userMeanRating + weightedSum / similaritySum;
-                predictions.push({
-                    placeId,
-                    predictedRating,
-                    confidence: similaritySum / k
-                });
-            }
-        }
-
-        // 根据位置信息过滤
-        if (location) {
-            const filteredPredictions = [];
-            for (const prediction of predictions) {
-                const place = await db.collection('places').doc(prediction.placeId).get();
-                const distance = this.calculateDistance(
-                    location.latitude,
-                    location.longitude,
-                    place.data.latitude,
-                    place.data.longitude
-                );
-                if (distance <= radius) {
-                    prediction.distance = distance;
-                    filteredPredictions.push(prediction);
-                }
-            }
-            predictions = filteredPredictions;
-        }
-
-        // 排序并返回结果
-        const recommendations = predictions
-            .sort((a, b) => b.predictedRating - a.predictedRating)
-            .slice(0, maxRecommendations);
-
-        // 缓存结果
-        this.cache.set(cacheKey, recommendations);
-        return recommendations;
-    }
-
-    // 计算两点之间的距离（米）
-    calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371000; // 地球半径（米）
-        const φ1 = lat1 * Math.PI / 180;
-        const φ2 = lat2 * Math.PI / 180;
-        const Δφ = (lat2 - lat1) * Math.PI / 180;
-        const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ/2) * Math.sin(Δλ/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-        return R * c;
-    }
-
-    // 清除缓存
-    clearCache() {
-        this.cache.clear();
-    }
-}
-```
-
-4. **使用示例**
-```javascript
-// 初始化推荐系统
-async function initializeRecommendationSystem() {
-    const dataPreprocessor = new DataPreprocessor();
-    await dataPreprocessor.loadUserRatings();
-    await dataPreprocessor.loadPlaceFeatures();
-
-    const similarityCalculator = new SimilarityCalculator(dataPreprocessor);
-    const recommendationSystem = new RecommendationSystem(dataPreprocessor, similarityCalculator);
-
-    return recommendationSystem;
-}
-
-// 获取推荐
-async function getRecommendations(userId, location) {
-    const recommendationSystem = await initializeRecommendationSystem();
-    
-    const recommendations = await recommendationSystem.generateRecommendations(userId, {
-        k: 5,
-        minSimilarity: 0.1,
-        maxRecommendations: 20,
-        location: location,
-        radius: 5000
-    });
-
-    return recommendations;
-}
-```
-
-这个实现包含了：
-1. 数据预处理
-2. 相似度计算（皮尔逊相关系数和余弦相似度）
-3. 推荐系统核心逻辑
-4. 位置感知的推荐过滤
-5. 缓存机制
-6. 使用示例
-
-主要特点：
-- 支持多种相似度计算方法
-- 考虑地理位置因素
-- 实现了缓存机制提高性能
-- 提供了灵活的配置选项
-- 包含完整的错误处理
-
-### 3.3 核心流程
-```mermaid
-graph TD
-    A[用户登录] --> B[获取用户位置]
-    B --> C[获取附近兴趣点]
-    C --> D[计算推荐分数]
-    D --> E[展示推荐结果]
-    E --> F[用户评分]
-    F --> G[更新推荐模型]
-```
-
-### 3.4 关键代码实现
-```javascript
-// 用户评分计算
-function calculateUserScore(userId, placeId, rating) {
-    // 更新用户评分
-    const userRating = {
-        userId: userId,
-        placeId: placeId,
-        rating: rating,
-        timestamp: Date.now()
-    };
-    return userRating;
-}
-
-// 推荐算法实现
-function generateRecommendations(userId) {
-    // 获取用户历史评分
-    // 计算相似用户
-    // 生成推荐列表
-}
-```
+4. **新颖性指标**
+   - 推荐结果的新颖性
+   - 用户满意度
+   - 推荐解释性
 
 ## 4. 使用说明
 

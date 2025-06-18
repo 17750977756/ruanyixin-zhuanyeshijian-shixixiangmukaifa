@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [],
+  "timeout": 60,
+  "envVariables": {},
+  "runtime": "Nodejs12.16"
+} 
